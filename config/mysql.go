@@ -1,16 +1,15 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-
-	"church-app-backend/models"
 )
+
+var DB *sql.DB
 
 // ConnectDatabase initializes the database connection
 func ConnectDatabase() {
@@ -30,12 +29,11 @@ func ConnectDatabase() {
 
 	fmt.Println("Mysql Connection: ", dsn)
 	// Open the database connection
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = sql.Open("mysql", dsn)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Error connecting to the database: %v", err)
 	}
-
 	// Assign the database connection to the global DB variable
-	models.DB = db
+
 	log.Println("Database connection established")
 }
