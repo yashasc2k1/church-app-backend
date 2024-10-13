@@ -2,13 +2,14 @@ package repositories
 
 import (
 	logger "church-app-backend/logger"
+	"church-app-backend/models"
 	"database/sql"
 	"time"
 )
 
 // Create new OTP
 func CreateOTP(tx *sql.Tx, userID int64, otpCode string, expiresAt time.Time, isUsed bool) error {
-	query := "INSERT INTO otp_verification (user_id, otp_code,created_at, expires_at, is_used) VALUES (?, ?, ?)"
+	query := "INSERT INTO otp_verification (user_id, otp_code,created_at, expires_at, is_used) VALUES (?, ?, ?, ?, ?)"
 	_, err := tx.Exec(query, userID, otpCode, time.Now(), expiresAt, isUsed)
 	if err != nil {
 		logger.Log.Error("Error Inserting OTP into Database")
@@ -17,16 +18,16 @@ func CreateOTP(tx *sql.Tx, userID int64, otpCode string, expiresAt time.Time, is
 }
 
 // Get OTP for user
-func GetOTP(tx *sql.Tx, userID int64) (string, time.Time, error) {
-	var otpCode string
-	var expiresAt time.Time
-	query := "SELECT otp_code, expires_at FROM otp_verification WHERE user_id = ? AND is_used = 0"
+func GetOTP(tx *sql.Tx, userID int64, otpCode string) (*models.OTP, error) {
+	var otp models.OTP
+	query := "SELECT otp_id, user_id, otp_code, created_at, expires_at, is_used FROM otp_verification WHERE user_id = ? AND otp_code = ? AND is_used = 0"
 
-	err := tx.QueryRow(query, userID).Scan(&otpCode, &expiresAt)
+	err := tx.QueryRow(query, userID, otpCode).Scan(&otp.ID, &otp.UserID, &otp.OTPCode, &otp.CreatedAt, &otp.ExpiresAt, &otp.IsUsed)
 	if err != nil {
-		return "", time.Time{}, err
+		return nil, err
 	}
-	return otpCode, expiresAt, nil
+
+	return &otp, nil
 }
 
 // Mark OTP as used

@@ -10,3 +10,8 @@ type OTP struct {
 	CreatedAt time.Time `json:"created_at"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
+
+type VerifyOTP struct {
+	UserID  int    `json:"user_id"`
+	OTPCode string `json:"otp_code"`
+}

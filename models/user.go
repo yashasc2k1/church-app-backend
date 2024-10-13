@@ -13,3 +13,9 @@ type User struct {
 	CreatedAt   time.Time `json:"created_at"`
 	ModifiedAt  time.Time `json:"modified_at"`
 }
+
+type UserLoginInput struct {
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+}
