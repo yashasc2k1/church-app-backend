@@ -29,10 +29,19 @@ func RegisterUser(c *fiber.Ctx) error {
 	//Validate if the phone number already exists
 	userExists, err := repositories.GetUserByPhoneNumber(tx, input.PhoneNumber)
 	if err != sql.ErrNoRows {
-		logger.Log.Error("Error checking user's existence: ", err)
-		return fiber.NewError(fiber.StatusInternalServerError, "Error checking user existence")
+		if userExists.IsVerified {
+			logger.Log.Error("Error checking user's existence: ", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Error checking user existence")
+		}
 	}
 
+	userExists, err = repositories.GetUserByEmail(tx, input.Email)
+	if err != sql.ErrNoRows {
+		if userExists.IsVerified {
+			logger.Log.Error("Error checking user's existence: ", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Error checking user existence")
+		}
+	}
 	userID := 0
 	if userExists != nil {
 		userID = int(userExists.UserID)
