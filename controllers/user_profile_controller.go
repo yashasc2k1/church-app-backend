@@ -20,7 +20,7 @@ func HandleCreateUserProfile(c *fiber.Ctx) error {
 
 	//Check if User Exists
 	user, err := repositories.GetUserByID(tx, int64(input.UserID))
-	if err != sql.ErrNoRows {
+	if err != nil && err != sql.ErrNoRows {
 		logger.Log.Error("Error finding User: ", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "Error finding User")
 	}

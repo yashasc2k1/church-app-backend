@@ -58,6 +58,13 @@ func HandleUserLogin(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid credentials")
 	}
 
+	//Check if the user profile exists
+	profile_exists := true
+	_, err = repositories.GetUserProfileByID(tx, user.UserID)
+	if err == sql.ErrNoRows {
+		profile_exists = false
+	}
+
 	// Optionally, generate a token or session (for authorization in future API requests)
 	token, err := utils.GenerateJWTToken(uint(user.UserID))
 	if err != nil {
@@ -67,8 +74,10 @@ func HandleUserLogin(c *fiber.Ctx) error {
 
 	// Return success response with token
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login successful",
-		"user_id": user.UserID,
-		"token":   token,
+		"message":        "Login successful",
+		"user_id":        user.UserID,
+		"token":          token,
+		"user_type":      user.UserType,
+		"profile_exists": profile_exists,
 	})
 }

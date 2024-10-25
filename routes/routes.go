@@ -2,6 +2,7 @@ package routes
 
 import (
 	"church-app-backend/controllers"
+	"church-app-backend/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,11 +28,24 @@ func SetupUserRoutes(app *fiber.App) {
 	//====================OTP=========================
 	user.Post("/otp/generate", controllers.GenerateOTP)
 
+	//===================LOGIN========================
+	user.Post("/login", controllers.HandleUserLogin)
+
+	//=========================================================================MIDDLEWARE INITIALIZED======================================================================
+	user.Use(middleware.AuthMiddleware)
+
 	//===================USER PROFILE=================
 	user.Post("/user-profile/", controllers.HandleCreateUserProfile)
 	user.Put("/user-profile/", controllers.HandleUpdateUserProfile)
 
-	//===================LOGIN========================
-	user.Post("/login", controllers.HandleUserLogin)
+	//====================USER==========================
+
+	user.Get("/donation-user-list", controllers.HandleGetAllDonationUsers)
+
+	//====================DONATIONS==========================
+	user.Post("/donation", controllers.HandleCreateDonation)     // Add a donation
+	user.Get("/donation/all", controllers.HandleGetAllDonations) // Get all donations
+	user.Get("/donation/total", controllers.HandleTotalDonationCount)
+	user.Get("/donation/:userID", controllers.HandleGetDonationByUserID) // Get donations by user ID
 
 }
