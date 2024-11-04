@@ -31,6 +31,10 @@ func SetupUserRoutes(app *fiber.App) {
 	//===================LOGIN========================
 	user.Post("/login", controllers.HandleUserLogin)
 
+	//====================PASSWORD RESET==========================
+	user.Post("/forgot-password", controllers.HandleForgotPassword)
+	user.Post("/reset-password", controllers.HandleResetPassword)
+
 	//=========================================================================MIDDLEWARE INITIALIZED======================================================================
 	user.Use(middleware.AuthMiddleware)
 
@@ -39,7 +43,6 @@ func SetupUserRoutes(app *fiber.App) {
 	user.Put("/user-profile/", controllers.HandleUpdateUserProfile)
 
 	//====================USER==========================
-
 	user.Get("/donation-user-list", controllers.HandleGetAllDonationUsers)
 
 	//====================DONATIONS==========================
