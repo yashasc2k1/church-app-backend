@@ -10,6 +10,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+/*
+		curl -X POST http://localhost:6666/api/user/login \
+	     -H "Content-Type: application/json" \
+	     -d '{
+	           "phone_number": "",
+	           "email": "sumankrgowda5@gmail.com",
+	           "password": "ZxMn@123"
+	         }'
+*/
 func HandleUserLogin(c *fiber.Ctx) error {
 	// Start a transaction
 	tx := c.Locals("tx").(*sql.Tx)
