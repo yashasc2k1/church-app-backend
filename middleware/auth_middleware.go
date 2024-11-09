@@ -3,6 +3,8 @@ package middleware
 import (
 	"church-app-backend/utils"
 
+	logger "church-app-backend/logger"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,6 +19,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	claims, err := utils.VerifyJWTToken(token)
 	if err != nil {
+		logger.Log.Error("Invalid / Expired Token")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Invalid or expired token",
 		})

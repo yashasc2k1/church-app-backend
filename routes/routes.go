@@ -39,8 +39,9 @@ func SetupUserRoutes(app *fiber.App) {
 	user.Use(middleware.AuthMiddleware)
 
 	//===================USER PROFILE=================
-	user.Post("/user-profile/", controllers.HandleCreateUserProfile)
-	user.Put("/user-profile/", controllers.HandleUpdateUserProfile)
+	user.Post("/user-profile", controllers.HandleCreateUserProfile)
+	user.Put("/user-profile", controllers.HandleUpdateUserProfile)
+	user.Get("/user-profile/:userID", controllers.HandleGetUserProfile)
 
 	//====================USER RELATED DONATION==========================
 	user.Get("/donation-user-list", controllers.HandleGetAllDonationUsers)

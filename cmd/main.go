@@ -27,6 +27,9 @@ func main() {
 	// Connect to the database
 	config.ConnectDatabase()
 
+	//Add request logging middleware
+	app.Use(middleware.RequestLoggingMiddleware)
+
 	// Add the transaction middleware
 	app.Use(middleware.TransactionMiddleware(config.DB))
 

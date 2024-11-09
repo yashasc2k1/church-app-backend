@@ -125,7 +125,7 @@ func HandleGetDonationByUserID(c *fiber.Ctx) error {
 }
 
 /*
-curl -X GET http://localhost:6666/api/user/donation/all -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjk4NzUwMjEsInVzZXJfaWQiOjI0fQ.FC6TyX4X5Uh9zVIN1QJ_0nX0qq7d1b68JPS4B8If1Ag"
+curl -X GET http://localhost:6666/api/user/donation/all -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzEyNzg3MzEsInVzZXJfaWQiOjV9.f4e7-hzdi5gkJQwnSynxVCJRanftAPwmhrOBaIKSzKc"
 */
 func HandleGetAllDonations(c *fiber.Ctx) error {
 	// Start a transaction
