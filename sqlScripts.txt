@@ -1,0 +1,4 @@
+UPDATE donations
+SET created_at = donated_at,
+    updated_at = donated_at
+WHERE created_at IS NULL OR updated_at IS NULL;

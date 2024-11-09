@@ -161,3 +161,97 @@ func HandleTotalDonationCount(c *fiber.Ctx) error {
 		"donations": totalDonations,
 	})
 }
+
+/*
+	curl -X PUT http://localhost:6666/api/user/donation \
+	  -H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzEyMzQ0ODksInVzZXJfaWQiOjF9.yu78LKmsWCQqoXjM3PlPvB0Hc9GoMCBodLRv1dOcwzg" \
+	  -H "Content-Type: application/json" \
+	  -d '{
+		"id": 13,
+	    "user_id": 2,
+	    "amount": 6000,
+	    "purpose": "Education"
+	  }'
+*/
+func HandleUpdateDonation(c *fiber.Ctx) error {
+	tx := c.Locals("tx").(*sql.Tx)
+
+	// Parse input from request body
+	var input models.Donations
+	if err := c.BodyParser(&input); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid input")
+	}
+
+	// Retrieve existing donation from the database
+	existingDonation, err := repositories.GetDonationByID(tx, int64(input.ID))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.Log.Error("Donation Does not exist")
+		} else {
+			logger.Log.Error("Error getting donation by donation id")
+		}
+		return fiber.NewError(fiber.StatusInternalServerError, "Error retrieving donation")
+	}
+
+	//update existing fields based on the input
+	if input.UserID != 0 {
+		//check if the user exists
+		_, err := repositories.GetUserByID(tx, int64(input.UserID))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				logger.Log.Error("User does not exist")
+				return fiber.NewError(fiber.StatusInternalServerError, "User does not exist")
+			}
+			logger.Log.Error("Error getting user from user-id")
+			return fiber.NewError(fiber.StatusInternalServerError, "Error getting user from user-id")
+
+		}
+
+		existingDonation.UserID = input.UserID
+	}
+
+	if input.Amount != 0 {
+		existingDonation.Amount = input.Amount
+	}
+
+	if input.Purpose != "" {
+		existingDonation.Purpose = input.Purpose
+	}
+
+	existingDonation.UpdatedAt = time.Now()
+
+	err = repositories.UpdateDonationByDonationID(tx, *existingDonation)
+	if err != nil {
+		logger.Log.Error("Error updating Donation")
+		return fiber.NewError(fiber.StatusInternalServerError, "Error updating Donation")
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Donation updated successfully",
+	})
+}
+
+/*
+		curl -X DELETE http://localhost:6666/api/user/donation/14 \
+	  	-H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzEyMzQ0ODksInVzZXJfaWQiOjF9.yu78LKmsWCQqoXjM3PlPvB0Hc9GoMCBodLRv1dOcwzg"
+*/
+func HandleDeleteDonation(c *fiber.Ctx) error {
+	tx := c.Locals("tx").(*sql.Tx)
+
+	// Get donation ID from URL params and convert to integer
+	id := c.Params("donationID")
+	donationID, err := strconv.Atoi(id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid donation ID")
+	}
+
+	// Call repository to delete the donation by ID
+	err = repositories.DeleteDonationByDonationID(tx, int64(donationID))
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Error deleting donation")
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Donation deleted successfully",
+	})
+}

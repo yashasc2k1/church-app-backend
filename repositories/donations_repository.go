@@ -97,6 +97,31 @@ func GetTotalDonationCount(tx *sql.Tx) (float64, error) {
 	return totalDonations, nil
 }
 
+func GetDonationByID(tx *sql.Tx, donationID int64) (*models.Donations, error) {
+	// SQL query to select all donations
+	query := `SELECT id, user_id, amount, purpose, donated_at, created_at, updated_at 
+	FROM donations
+	WHERE id = ?`
+
+	var donation models.Donations
+	err := tx.QueryRow(query, donationID).Scan(
+		&donation.ID,
+		&donation.UserID,
+		&donation.Amount,
+		&donation.Purpose,
+		&donation.DonatedAt,
+		&donation.CreatedAt,
+		&donation.UpdatedAt,
+	)
+
+	if err != nil {
+		logger.Log.Error("Error Getting Donation by Donation ID")
+		return nil, err
+	}
+
+	return &donation, nil
+}
+
 func GetDonationsByUserID(tx *sql.Tx, userID int64) ([]models.Donations, error) {
 	// SQL query to select all donations
 	query := `SELECT id, user_id, amount, purpose, donated_at 
@@ -131,4 +156,25 @@ func GetDonationsByUserID(tx *sql.Tx, userID int64) ([]models.Donations, error) 
 	}
 
 	return donations, nil
+}
+
+func UpdateDonationByDonationID(tx *sql.Tx, donation models.Donations) error {
+	//SQL query to update donation
+	query := `
+		UPDATE donations 
+		SET user_id = ?, amount = ?, purpose = ?, updated_at = NOW() 
+		WHERE id = ?`
+
+	_, err := tx.Exec(query, donation.UserID, donation.Amount, donation.Purpose, donation.ID)
+	return err
+}
+
+func DeleteDonationByDonationID(tx *sql.Tx, donationID int64) error {
+	query := `DELETE FROM donations WHERE id = ?`
+
+	_, err := tx.Exec(query, donationID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
