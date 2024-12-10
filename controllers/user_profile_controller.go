@@ -44,6 +44,14 @@ func HandleCreateUserProfile(c *fiber.Ctx) error {
 	})
 }
 
+/*
+		curl -X PUT "http://localhost:6666/api/user/user-profile" \
+		-H "Content-Type: application/json" \
+		-H "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzEzMjM0ODgsInVzZXJfaWQiOjV9.VH4g8fgoXah-SqMBeXhKolpV0q6zLqY4BtL-SYwPWTU" \
+		-d '{
+	  "user_id":5,"full_name":"Bruce Wenneck","date_of_birth":"2024-11-01T00:00:00+05:30","gender":"Female","profession":"Teacher","marital_status":"Single","marriage_date":null
+	}'
+*/
 func HandleUpdateUserProfile(c *fiber.Ctx) error {
 	tx := c.Locals("tx").(*sql.Tx)
 	var input models.UserProfile
